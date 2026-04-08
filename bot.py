@@ -3,7 +3,6 @@ import os
 from flask import Flask
 from threading import Thread
 
-# ========== ВЕБ-СЕРВЕР ДЛЯ RAILWAY ==========
 app = Flask('')
 
 @app.route('/')
@@ -16,14 +15,11 @@ def run():
 def keep_alive():
     t = Thread(target=run)
     t.start()
-# ============================================
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-# ===== НАСТРОЙКИ =====
-VOICE_CHANNEL_ID = 981189520135454791   # ЗАМЕНИТЕ НА ВАШ ID
+VOICE_CHANNEL_ID = 981189520135454791   # ЗАМЕНИТЕ
 MUSIC_FILE = "track.mp3"
-# ====================
 
 class MusicBot(discord.Client):
     async def on_ready(self):
@@ -43,14 +39,15 @@ class MusicBot(discord.Client):
             await self.close()
             return
         
-        # Получаем имя трека без расширения
         track_name = os.path.splitext(os.path.basename(MUSIC_FILE))[0]
         
-        # Меняем статус бота (то, что пишется "Играет в...")
-        await self.change_presence(activity=discord.Game(name=f"🎵 {track_name}"))
-        print(f"🎵 Статус бота изменён на: Играет {track_name}")
+        # Меняем СТАТУС канала (текст под названием)
+        try:
+            await channel.edit(status=f"🎵 {track_name}")
+            print(f"📝 Статус канала изменён на: {track_name}")
+        except Exception as e:
+            print(f"⚠️ Не удалось изменить статус канала: {e}")
         
-        # Функция для зацикливания
         def repeat(error):
             if error:
                 print(f"❌ Ошибка воспроизведения: {error}")
@@ -60,9 +57,8 @@ class MusicBot(discord.Client):
             else:
                 print("⚠️ Соединение потеряно, повтор не запущен")
         
-        # Запускаем воспроизведение
         vc.play(discord.FFmpegPCMAudio(MUSIC_FILE), after=repeat)
-        print(f"🎶 Играет: {track_name} (зациклено)")
+        print(f"🎶 Играет: {track_name}")
 
 client = MusicBot()
 
