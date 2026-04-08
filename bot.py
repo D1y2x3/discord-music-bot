@@ -43,13 +43,14 @@ class MusicBot(discord.Client):
             await self.close()
             return
         
+        # Получаем имя трека без расширения
         track_name = os.path.splitext(os.path.basename(MUSIC_FILE))[0]
-        try:
-            await channel.edit(name=f"🎵 {track_name}")
-            print(f"🏷️ Название канала изменено на: {track_name}")
-        except Exception as e:
-            print(f"⚠️ Не удалось изменить название канала: {e}")
         
+        # Меняем статус бота (то, что пишется "Играет в...")
+        await self.change_presence(activity=discord.Game(name=f"🎵 {track_name}"))
+        print(f"🎵 Статус бота изменён на: Играет {track_name}")
+        
+        # Функция для зацикливания
         def repeat(error):
             if error:
                 print(f"❌ Ошибка воспроизведения: {error}")
@@ -59,6 +60,7 @@ class MusicBot(discord.Client):
             else:
                 print("⚠️ Соединение потеряно, повтор не запущен")
         
+        # Запускаем воспроизведение
         vc.play(discord.FFmpegPCMAudio(MUSIC_FILE), after=repeat)
         print(f"🎶 Играет: {track_name} (зациклено)")
 
